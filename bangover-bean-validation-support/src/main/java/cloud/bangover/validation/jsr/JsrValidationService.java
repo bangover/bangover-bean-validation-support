@@ -1,15 +1,19 @@
 package cloud.bangover.validation.jsr;
 
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Validator;
+import javax.validation.metadata.ConstraintDescriptor;
+
 import cloud.bangover.validation.ErrorMessage;
 import cloud.bangover.validation.ValidationGroup;
 import cloud.bangover.validation.ValidationService;
 import cloud.bangover.validation.ValidationState;
 import cloud.bangover.validation.context.ValidationContext;
-import java.util.Optional;
-import javax.validation.ConstraintViolation;
-import javax.validation.Path;
-import javax.validation.Validator;
-import javax.validation.metadata.ConstraintDescriptor;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -27,7 +31,9 @@ public class JsrValidationService implements ValidationService {
   @Override
   public <V> ValidationState validate(V validatable) {
     ValidationState result = new ValidationState();
-    for (ConstraintViolation<V> violation : validator.validate(validatable)) {
+    Set<ConstraintViolation<V>> validationConstraints =
+        Optional.ofNullable(validatable).map(validator::validate).orElse(Collections.emptySet());
+    for (ConstraintViolation<V> violation : validationConstraints) {
       result = Violation.from(violation.getPropertyPath(), violation.getConstraintDescriptor())
           .expand(result);
     }

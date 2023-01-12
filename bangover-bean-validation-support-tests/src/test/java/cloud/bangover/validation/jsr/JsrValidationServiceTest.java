@@ -43,6 +43,16 @@ public class JsrValidationServiceTest {
   }
 
   @Test
+  public void shouldValidateObjectReturnValidStateIfNullReceived() {
+    // Given
+    ValidationService validationService = new JsrValidationService(validatorFactory.getValidator());
+    // When
+    ValidationState validationState = validationService.validate(null);
+    // Then
+    Assert.assertTrue(validationState.isValid());
+  }
+
+  @Test
   public void shouldValidateObjectUsingBeanValidation() {
     // Given
     ValidationService validationService = new JsrValidationService(validatorFactory.getValidator());
